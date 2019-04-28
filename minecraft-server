@@ -1,0 +1,67 @@
+#!/bin/bash
+#::             RTD System System Managment Script
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#:: Author:     Stephan S. 
+#:: Version 1.00
+#::
+#::
+#:: Purpose: The purpose of the script is to perform managment tasks on Linux systems
+#::  
+#:: This is a script that will start Minecraft Server on an Ubuntu or Debian based server. It will start 
+#:: multiple panes using "byobu", and start the server etc there... 
+#::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+function check_dependencies ()
+{
+#---------------------------------------------------------------
+echo "Checking for script dependencies and install if not there..."
+#---------------------------------------------------------------
+    if hash $1 2>/dev/null; then
+        echo "I found that $1 is present on this system... thankyou for that! "
+    else
+        echo "You seem to have no $1... I will try to get it... "
+        sudo apt install $1 -y
+            if [ $? != 0 ];
+            then
+                echo "That install didn't work out so well."
+                echo "Please manually try to add the software since I couldn't do it."
+                exit
+            fi
+        echo "OK Done! Continuing..."
+    fi
+}
+
+# Check that the required packages are installed and add them if not. 
+check_dependencies byobu
+check_dependencies speedometer
+check_dependencies htop
+
+# Start byobu multi screen app... 
+byobu new-session -d -s $USER
+
+# status screen
+byobu rename-window -t $USER:0 'status'
+byobu send-keys "~/bin/minecraft.server/Minecraft.Latest/start.sh" C-m
+
+# Create new pane vertically and display htop
+byobu split-window -v
+byobu send-keys "htop " C-m
+
+# Split the "htop" window in 2, and start spedometer there.
+byobu split-window -h
+byobu send-keys "speedometer -r eth0  -t eth0" C-m
+
+# Create new window...
+byobu new-window -t $USER:1 -n 'CMD'
+byobu send-keys "python ~/bin/minecraft.server/Minecraft.Latest/announce.py" C-m
+
+# Set default window as the dev split plane
+byobu select-window -t $USER:0
+byobu-tmux select-pane -t 0
+
+# Attach to the session you just created
+byobu attach-session -t $USER
+
