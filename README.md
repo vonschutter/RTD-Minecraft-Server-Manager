@@ -6,7 +6,7 @@ A minecraft server launcher script. Seting up your own Minecraft server on an Ub
 This is a tool to start and monitor a Java minecraft server. It will start minecraft from the ~/bin/ directory in a users home folder. It will also announce the Minecraft server on the local netowork. 
 
 ## How to use this script. 
-To use this script just download this script (minecraf.server) to your home folders and run it: 
+To use this script just download this script (minecraft.server) to your home folder and run it: 
 
 - Install or reuse a handy Ubuntu server or desktop system. 
 - SSH to your Ubuntu system or open a terminal if you are using your Ubuntu Desktop. 
