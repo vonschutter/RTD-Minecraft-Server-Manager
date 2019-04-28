@@ -100,7 +100,7 @@ function run_minecraft_server_manager (){
 
         # status screen
         byobu rename-window -t $USER:0 'status'
-        byobu send-keys "$MINECRAFT_HOME/start.sh" C-m
+        byobu send-keys "bash $MINECRAFT_HOME/start.sh" C-m
 
         # Create new pane vertically and display htop
         byobu split-window -v
