@@ -99,7 +99,7 @@ function run_minecraft_server_manager (){
         byobu new-session -d -s $USER
 
         # status screen
-        byobu rename-window -t $USER:0 'status'
+        byobu rename-window -t $USER:0 'Minecraft Server Manager'
         byobu send-keys "bash $MINECRAFT_HOME/start.sh" C-m
 
         # Create new pane vertically and display htop
