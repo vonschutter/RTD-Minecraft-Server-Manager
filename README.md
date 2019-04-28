@@ -10,7 +10,7 @@ To use this script just download this script (minecraf.server) to your home fold
 
 - Install or reuse a handy Ubuntu server or desktop system. 
 - SSH to your Ubuntu system or open a terminal if you are using your Ubuntu Desktop. 
-- download the script to your home folder:
+- Download the script to your home folder:
 ```
 wget https://github.com/vonschutter/Ubuntu-Minecraft-Server-Manager/raw/master/minecraft-server
 ```
