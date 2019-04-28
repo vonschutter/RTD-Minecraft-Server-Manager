@@ -79,7 +79,7 @@ function setup_minecraft_root (){
         # This tests if the script files are available and downloades them if not. 
         mkdir -p $MINECRAFT_HOME 
 
-        for i in start.sh announce.py 
+        for i in start.sh announce.py server.properties eula.txt
         do
             if [ ! -f "$MINECRAFT_HOME/$i" ]; then
                 wget -q --show-progress $MCSTART_URL/"$i" -P $MINECRAFT_HOME
