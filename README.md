@@ -27,7 +27,7 @@ bash minecraft.server
 - Check and see if Minecraft is installed in the expected localion on the server. 
 - If no server is found in the expected location, one will be downloaded.
 - Check that the relevant scripts and configuration files are in the expected locations. 
-- If the configuration files are not found, the script will get basic working scripts.
+- If the configuration files are not found, the script will get basic working configuration files.
 - Check if the required software is available:
 -   Install Java if not there
 -   Install the software needed by the console if not there
