@@ -108,7 +108,7 @@ function run_minecraft_server_manager (){
 
         # Split the "htop" window in 2, and start spedometer there.
         byobu split-window -h
-        byobu send-keys "speedometer -r eth0  -t eth0" C-m
+        byobu send-keys "speedometer -r $NETINT  -t $NETINT" C-m
 
         # Create new window...
         byobu new-window -t $USER:1 -n 'CMD'
@@ -139,6 +139,11 @@ function enssure_oracle_java (){
 }
 
 
+function find_active_newtork_interface (){
+    NETINT=`ip addr | awk '/state UP/ {print $2}' |grep -v "br*" |grep -v "wlp*" | head --bytes -2 `
+    export $NETINT
+}
+
 
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -162,6 +167,7 @@ setup_minecraft_root
 enssure_oracle_java 
   
 # Start the server and monitor the server performance
+find_active_newtork_interface
 run_minecraft_server_manager
 
 
