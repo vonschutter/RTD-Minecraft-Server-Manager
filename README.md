@@ -19,6 +19,11 @@ wget https://github.com/vonschutter/Ubuntu-Minecraft-Server-Manager/raw/master/m
 bash minecraft.server
 ```
 
+As of version 1.02 you can also launch the "minecraft.server" with the "--update" option to download the latest minecraft version automatically. 
+```
+bash minecraft.server --update
+```
+
 ### Minecraft Server Manager:
 ![Minecraft Manager Screenshot](Media_files/Scr1.png?raw=true "Executing the Script")
 
