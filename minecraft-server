@@ -3,7 +3,7 @@
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #:: Author:     Stephan S. 
-#:: Version 1.00
+#:: Version 1.02
 #::
 #::
 #:: Purpose: The purpose of the script is to perform managment tasks on Linux systems
@@ -145,7 +145,29 @@ function find_active_newtork_interface (){
 }
 
 
+ function minecraft_update() {
+    # Get minecraft version publication file and get the latest server URL
+    cd $MINECRAFT_HOME  
+    wget -q -O $MINECRAFT_HOME/versions --no-check-certificate https://launchermeta.mojang.com/mc/game/version_manifest.json
+    JSONVERSION=`cat versions | python -c "exec(\"import json,sys\nobj=json.load(sys.stdin)\nversion=obj['latest']['release']\nfor v in obj['versions']:\n   if v['id']==version:\n    print(v['url'])\")"`
+    wget -q -O $MINECRAFT_HOME/versions --no-check-certificate $JSONVERSION
+    MC_SERVER_URL=`cat versions | python -c 'import json,sys;obj=json.load(sys.stdin);print(obj["downloads"]["server"]["url"])'`
+    rm $MINECRAFT_HOME/versions
 
+    # Download the latest minecraft vesrion and check if it is the same as the one installed
+     wget -q -O $MINECRAFT_HOME/minecraft_server.jar.update --no-check-certificate $MC_SERVER_URL
+     if [ -f $MINECRAFT_HOME/minecraft_server.jar.update ] ; then
+       if `diff $MINECRAFT_HOME/$MINECRAFT_JAR $MINECRAFT_HOME/minecraft_server.jar.update >/dev/null` ; then
+         echo "You are already running the latest version of $MINECRAFT_JAR."
+       else
+        mv $MINECRAFT_JAR $MINECRAFT_JAR.previous
+        mv $MINECRAFT_HOME/minecraft_server.jar.update $MINECRAFT_HOME/$MINECRAFT_JAR
+        echo "Minecraft successfully updated."
+       fi
+     else
+       echo "Minecraft update could not be downloaded."
+     fi
+ }
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::                                          ::::::::::::::::::::::
 #::::::::::::::          Script Executive                ::::::::::::::::::::::
@@ -159,6 +181,9 @@ check_dependencies byobu
 check_dependencies speedometer
 check_dependencies htop
 check_dependencies python
+
+
+if [ $1 = --update ]; then minecraft_update ; fi
 
 # Basic check to see that the Minecraft folder is present and 
 # if not crate it and download the scripts and the server jar file
