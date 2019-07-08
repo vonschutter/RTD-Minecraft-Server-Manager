@@ -84,11 +84,10 @@ function setup_minecraft_root (){
             if [ ! -f "$MINECRAFT_HOME/$i" ]; then
                 wget -q --show-progress $MCSTART_URL/"$i" -P $MINECRAFT_HOME
             fi
-
         done
 
         if [ ! -f "$MINECRAFT_HOME/$MINECRAFT_JAR" ]; then
-            wget -q --show-progress $MINECRAFT_URL -P $MINECRAFT_HOME
+            minecraft_update
         fi
 }
 
