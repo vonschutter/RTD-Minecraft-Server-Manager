@@ -1,6 +1,6 @@
 # Ubuntu Minecraft Server Manager
 
-A minecraft server launcher script. Seting up your own Minecraft server on an Ubuntu server has never been easier! 
+A minecraft server launcher script. Setting up your own Minecraft server on Ubuntu has never been easier! Just launch the script and it will do the rest! 
 
 ## Purpose:
 This is a tool to start and monitor a Java minecraft server. If the Ubuntu Minecraft Server Manager finds a minecraft server in the ~/bin/ directory in a users home folder, it will start it, and if it does not find a Minecraft server it will download one for you. BONUS: It will also announce the Minecraft server on the local network. 
@@ -10,11 +10,11 @@ To use this script just download this script (minecraft.server) to your home fol
 
 - Install or reuse a handy Ubuntu server or desktop system. 
 - SSH to your Ubuntu system or open a terminal if you are using your Ubuntu Desktop. 
-- Download the script to your home folder:
+- Download the script to your home folder (you may cut and paste the line below):
 ```
 wget https://github.com/vonschutter/Ubuntu-Minecraft-Server-Manager/raw/master/minecraft-server
 ```
-- Then run the script: 
+- Then run the script by typing: 
 ```
 bash minecraft.server
 ```
