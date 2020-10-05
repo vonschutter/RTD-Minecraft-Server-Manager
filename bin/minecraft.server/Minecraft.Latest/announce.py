@@ -7,10 +7,10 @@
 # ::
 # ::
 # :: Purpose: The purpose of the script is to:
-# ::          1 - Broadcast service availability to the local network 
+# ::          1 - Broadcast service availability to the local network. 
 # ::              This script is used to broadcast the minecraft server on the  
-# ::              sam machine. See "servers". You may have as many as you like.
-# ::
+# ::              same machine (see "servers"). You may have as many minecraft 
+# ::              servers running and broadcast as you like. 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
