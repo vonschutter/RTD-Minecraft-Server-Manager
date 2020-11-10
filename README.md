@@ -1,4 +1,4 @@
-# Ubuntu Minecraft Server Manager
+# RTD Minecraft Server Manager
 
 The minecraft server launcher script. Setting up your own Minecraft server on Ubuntu has never been easier! Just launch the script and it will do the rest! 
 
