@@ -10,15 +10,15 @@ This is a tool to start and monitor a Java minecraft server. If the Ubuntu Minec
 ## How to use this script. 
 To use this script just download this script (minecraft.server) to your home folder and run it: 
 
-1 Install or reuse a handy Ubuntu server or desktop system. 
-2 SSH to your Ubuntu system or open a terminal if you are using your Ubuntu Desktop. 
-3 Download the script to your home folder (you may cut and paste the line below):
+1 - Install or reuse a handy Ubuntu server or desktop system. 
+2 - SSH to your Ubuntu system or open a terminal if you are using your Ubuntu Desktop. 
+3 - Download the script to your home folder (you may cut and paste the line below):
 
 ```
 wget https://github.com/vonschutter/Ubuntu-Minecraft-Server-Manager/raw/master/minecraft-server
 ```
 
-4 Then run the script by typing: 
+4 - Then run the script by typing: 
 
 ```
 bash minecraft.server
