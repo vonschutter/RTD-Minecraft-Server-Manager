@@ -12,25 +12,26 @@ To use this script just download this script (minecraft.server) to your home fol
 
 1. Install or reuse a handy Ubuntu server or desktop system. 
 2. SSH to your Ubuntu system or open a terminal if you are using your Ubuntu Desktop. 
-3. Download the script to your home folder (you may cut and paste the line below):
+3. To download and optionally install the latest Minecraft (you may cut and paste the line below):
 
 ```
-wget https://github.com/vonschutter/Ubuntu-Minecraft-Server-Manager/raw/master/minecraft-server
+wget https://github.com/vonschutter/Ubuntu-Minecraft-Server-Manager/raw/master/minecraft-server -O ~/ && chmod +x ~/minecraft-server && ~/minecraft-server
 ```
 
-4. Then run the script by typing: 
+4. Then to run the RTD-Minecraft-Server-Manager next time you want to by typing: 
 
 ```
-bash minecraft.server
+~/minecraft.server
 ```
 
 As of version 1.02 you can also launch the "minecraft.server" with the "--update" option to download the latest minecraft version automatically. 
 
 ```
-bash minecraft.server --update
+~/minecraft.server --update
 ```
 
 ## Features:
+When the RTD-Minecraft-Server-Manager is started, it will do the collowing.
 
 - Check and see if Minecraft is installed in the expected localion on the server. 
 - If no server is found in the expected location, one will be downloaded.
