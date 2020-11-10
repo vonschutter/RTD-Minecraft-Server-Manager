@@ -13,15 +13,19 @@ To use this script just download this script (minecraft.server) to your home fol
 - Install or reuse a handy Ubuntu server or desktop system. 
 - SSH to your Ubuntu system or open a terminal if you are using your Ubuntu Desktop. 
 - Download the script to your home folder (you may cut and paste the line below):
+
 ```
 wget https://github.com/vonschutter/Ubuntu-Minecraft-Server-Manager/raw/master/minecraft-server
 ```
+
 - Then run the script by typing: 
+
 ```
 bash minecraft.server
 ```
 
 As of version 1.02 you can also launch the "minecraft.server" with the "--update" option to download the latest minecraft version automatically. 
+
 ```
 bash minecraft.server --update
 ```
