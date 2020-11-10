@@ -31,7 +31,7 @@ bash minecraft.server --update
 ```
 
 ## Features:
-```
+
 - Check and see if Minecraft is installed in the expected localion on the server. 
 - If no server is found in the expected location, one will be downloaded.
 - Check that the relevant scripts and configuration files are in the expected locations. 
@@ -41,4 +41,3 @@ bash minecraft.server --update
 -   Install the software needed by the console if not there
 - When all of the above is satisfied the server luncher console is started
 
-```
