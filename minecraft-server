@@ -2,8 +2,8 @@
 #::             RTD System System Managment Script
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-#:: Author:     Stephan S. 
-#:: Version 1.02
+#:: Author:     SLS. 
+#:: Version:	1.03
 #::
 #::
 #:: Purpose: The purpose of the script is to perform managment tasks on Linux systems
@@ -62,7 +62,7 @@ echo "Checking for script dependencies and install if not there..."
         echo "I found that $1 is present on this system... thankyou for that! "
     else
         echo "You seem to have no $1... I will try to get it... "
-        sudo apt install $1 -y
+        install_software $1
             if [ $? != 0 ];
             then
                 echo "That install didn't work out so well."
@@ -71,6 +71,24 @@ echo "Checking for script dependencies and install if not there..."
             fi
         echo "OK Done! Continuing..."
     fi
+}
+
+install_software () 
+{
+	if hash pkcon 2>/dev/null; then
+		sudo pkcon -y  install $@
+	elif hash yum 2>/dev/null; then
+		sudo yum -y  install $@
+	elif hash zypper 2>/dev/null; then
+		sudo zypper install -y $@
+	elif hash apt-get 2>/dev/null; then
+		export DEBIAN_FRONTEND=noninteractive
+		sudo apt-get -y -qq --allow-change-held-packages --ignore-missing install $@
+	else
+		echo -e $YELLOW "This system does not seem to have a software managment system" $ENDCOLOR
+		_cleanup
+		exit 1
+	fi
 }
 
 function setup_minecraft_root (){
@@ -122,24 +140,19 @@ function run_minecraft_server_manager (){
 }
 
 
-function enssure_oracle_java (){
+function check_java (){
     java --version >/dev/null 
     if [ $? -eq 0 ]; then
         echo "java of some version is present. I respect your choice... and will try to run! --- OK!"
     else
-        # Add the Oracle Java repository and install the software. 
-        echo Please provide administrative password to make shanges to the system: 
-        sudo add-apt-repository ppa:linuxuprising/java -y
-        sudo apt-get update
-        echo oracle-java11-installer shared/accepted-oracle-license-v1-2 select true | sudo /usr/bin/debconf-set-selections && \
-        sudo apt install -y oracle-java11-installer && \
-        sudo apt install -y oracle-java11-set-default
+        check_dependencies default-jre
     fi
 }
 
 
 function find_active_newtork_interface (){
     NETINT=`ip addr | awk '/state UP/ {print $2}' |grep -v "br*" |grep -v "wlp*" | head --bytes -2 `
+    echo "Active network interface is: $NETINT"
     export $NETINT
 }
 
@@ -167,6 +180,8 @@ function find_active_newtork_interface (){
        echo "Minecraft update could not be downloaded."
      fi
  }
+
+ 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::                                          ::::::::::::::::::::::
 #::::::::::::::          Script Executive                ::::::::::::::::::::::
@@ -183,13 +198,14 @@ check_dependencies python
 
 
 if [ $1 = --update ]; then minecraft_update ; fi
+if [ $1 = --command ]; then $2 ; exit ; fi
 
 # Basic check to see that the Minecraft folder is present and 
 # if not crate it and download the scripts and the server jar file
 # to enable the server. 
 setup_minecraft_root
-enssure_oracle_java 
-  
+check_java 
+
 # Start the server and monitor the server performance
 find_active_newtork_interface
 run_minecraft_server_manager
