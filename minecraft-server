@@ -191,7 +191,7 @@ function find_active_newtork_interface (){
 # iff they are not, attempt to install them. 
 for i in byobu speedometer htop python python3 dialog
 do
-	check_dependencies $1
+	check_dependencies $i
 done
 
 if echo "$@" | grep "update" ; then minecraft_update ; fi
