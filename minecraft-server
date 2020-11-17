@@ -156,7 +156,7 @@ function find_active_newtork_interface (){
 
  function minecraft_update() {
 	# Get minecraft version publication file and get the latest server URL
-	# This is an unneccessarily complicated by Mojang! 
+	# This is an unneccessarily complicated way by Mojang! 
 	cd $MINECRAFT_HOME || { echo "Failure change to Minecraft folder. Is it there?"; exit 1; }
 	wget -q -O $MINECRAFT_HOME/versions --no-check-certificate https://launchermeta.mojang.com/mc/game/version_manifest.json
 	JSONVERSION=$(cat versions | python -c "exec(\"import json,sys\nobj=json.load(sys.stdin)\nversion=obj['latest']['release']\nfor v in obj['versions']:\n   if v['id']==version:\n    print(v['url'])\")")
@@ -167,15 +167,16 @@ function find_active_newtork_interface (){
 	# Download the latest minecraft vesrion and check if it is the same as the one installed
 	wget -q -O $MINECRAFT_HOME/minecraft_server.jar.update --no-check-certificate $MC_SERVER_URL
 	if [ -f $MINECRAFT_HOME/minecraft_server.jar.update ] ; then
-	if diff $MINECRAFT_HOME/$MINECRAFT_JAR $MINECRAFT_HOME/minecraft_server.jar.update >/dev/null ; then
-		echo "You are already running the latest version of $MINECRAFT_JAR."
+		if diff $MINECRAFT_HOME/$MINECRAFT_JAR $MINECRAFT_HOME/minecraft_server.jar.update >/dev/null ; then
+			dialog --title 'Minecraft Update' --msgbox "You are already running the latest version of $MINECRAFT_JAR." 0 0 
 	else
-	mv $MINECRAFT_JAR $MINECRAFT_JAR.previous
-	mv $MINECRAFT_HOME/minecraft_server.jar.update $MINECRAFT_HOME/$MINECRAFT_JAR
-	echo "Minecraft successfully updated."
+		mv $MINECRAFT_JAR $MINECRAFT_JAR.previous
+		mv $MINECRAFT_HOME/minecraft_server.jar.update $MINECRAFT_HOME/$MINECRAFT_JAR
+		dialog --title 'Minecraft Update' --msgbox "Minecraft successfully updated." 0 0 
 	fi
 	else
-	echo "Minecraft update could not be downloaded."
+		dialog --title 'Minecraft Update' --msgbox "Minecraft update could not be downloaded." 0 0 
+		echo 
 	fi
 }
 
@@ -194,7 +195,17 @@ do
 	check_dependencies $i
 done
 
-if echo "$@" | grep "update" ; then minecraft_update ; fi
+if echo "$@" | grep "update" ;then
+	dialog --title "Update to latest Minecraft?"  --yesno "You have requested that I try to get the latest verion of Minecraft from Mojang. This means that the people playing in the server also will need the latest version. Is this OK?" 0 0
+		case $? in
+		0)
+		minecraft_update ;;
+		1)
+		echo "Proceeding without update...";;
+		255)
+		echo "ESC pressed.";;
+		esac
+fi
 
 # Basic check to see that the Minecraft folder is present and 
 # if not crate it and download the scripts and the server jar file
