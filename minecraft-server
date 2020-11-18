@@ -97,7 +97,7 @@ function setup_minecraft_root (){
 	for i in start.sh announce.py server.properties eula.txt
 	do
 		if [ ! -f "$MINECRAFT_HOME/$i" ]; then
-		wget -q --show-progress $MCSTART_URL/"$i" -P $MINECRAFT_HOME
+		$i $MINECRAFT_HOME
 		fi
 	done
 
@@ -125,8 +125,8 @@ function run_minecraft_server_manager (){
 	byobu send-keys "speedometer -r $NETINT  -t $NETINT" C-m
 
 	# Create new window...
-	byobu new-window -t $USER:1 -n 'Anouncing on Network'
-	byobu send-keys "python $MINECRAFT_HOME/announce.py" C-m
+	byobu new-window -t $USER:1 -n 'Anouncing on Network (Press F4 to switch between windows)'
+	byobu send-keys "python3 $MINECRAFT_HOME/announce.py" C-m
 
 	# Set default window as the dev split plane
 	byobu select-window -t $USER:0
@@ -151,6 +151,7 @@ function find_active_newtork_interface (){
 	# Detect the name of the active network interface.
 	NETINT=$(ip addr | awk '/state UP/ {print $2}' |grep -v "br*" |grep -v "wlp*" | head --bytes -2 )
 	echo "Active network interface is: $NETINT"
+	export NETINT
 }
 
 
@@ -183,6 +184,196 @@ function find_active_newtork_interface (){
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::                                          ::::::::::::::::::::::
+#::::::::::::::    Script internal config repository     ::::::::::::::::::::::
+#::::::::::::::                                          ::::::::::::::::::::::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+announce.py () {
+	cat >> $1/announce.py <<-'EOF'
+#!/bin/python3
+#              RTD System System Managment Script
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# :: Author:     Stephan S. 
+# :: Version 1.01
+# ::
+# ::
+# :: Purpose: The purpose of the script is to:
+# ::          1 - Broadcast service availability to the local network. 
+# ::              This script is used to broadcast the minecraft server on the  
+# ::              same machine (see "servers"). You may have as many minecraft 
+# ::              servers running and broadcast as you like. 
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# :::::::::::::                                          ::::::::::::::::::::::
+# :::::::::::::          Script init                     ::::::::::::::::::::::
+# :::::::::::::                                          ::::::::::::::::::::::
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+import socket
+import time
+import sys
+import os
+import urllib.request
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# :::::::::::::                                          ::::::::::::::::::::::
+# :::::::::::::          Script Executive                ::::::::::::::::::::::
+# :::::::::::::                                          ::::::::::::::::::::::
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+servers = [
+    ["Local Network - Minecraft Server", 25565],
+]
+
+BROADCAST_IP = "255.255.255.255"
+BROADCAST_PORT = 4445
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+print("Broadcasting Minecraft servers to LAN on: " + os.environ['NETINT'])
+print("Local IP adress: ")
+print((([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0])
+
+print("External IP address visible on the internet: ")
+external_ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
+print(external_ip)
+
+while True:
+    for server in servers:
+        msg = "[MOTD]%s[/MOTD][AD]%d[/AD]" % (server[0], server[1])
+        encode = str.encode(msg)
+        sock.sendto(encode, (BROADCAST_IP, BROADCAST_PORT))
+    time.sleep(3)
+	EOF
+}
+
+
+start.sh () {
+	cat >> $1/start.sh <<-'EOF'
+#!/bin/bash
+#::             RTD System System Managment Script
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#:: Author:     Stephan S. 
+#:: Version 1.00
+#::
+#::
+#:: Purpose: The purpose of the script is to:
+#::          1 - Launch Minecraft 
+#::          2 - Check that Minecraft runs for at least one minute
+#::          3 - If Minecraft crashes or quits after one minute, restart Minecraft 
+#::  
+#::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#::::::::::::::                                          ::::::::::::::::::::::
+#::::::::::::::          Script Executive                ::::::::::::::::::::::
+#::::::::::::::                                          ::::::::::::::::::::::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+pushd $(dirname "$0")
+
+MC_SERVER_NAME=`cat server.properties |grep "motd=.*" ` 
+export $MC_SERVER_NAME
+
+while true; do
+
+    start_epoch=$(date +%s)
+    echo Starting Minecraft server $MC_SERVER_NAME ....
+    java -Xmx2048M -Xms2048M -jar $(dirname "$0")/server.jar noggui broadcast
+
+    # Abort if the application exited too quickly
+    duration=$(( $(date +%s) - $start_epoch ))
+    if [[ "$duration" < 60 ]]; then
+        echo "Program exited too quickly! Aborting Minecraft Launcher...."
+        exit
+    fi
+
+done
+
+exit
+	EOF
+}
+
+
+server.properties () {
+	cat >> $1/server.properties <<-'EOF'
+#Minecraft server properties
+#Sun Apr 28 13:04:16 CEST 2019
+broadcast-rcon-to-ops=true
+view-distance=6
+max-build-height=256
+server-ip=
+rcon.port=25575
+level-seed=
+allow-nether=true
+gamemode=survival
+enable-command-block=true
+server-port=25565
+enable-rcon=false
+enable-query=true
+op-permission-level=3
+prevent-proxy-connections=false
+generator-settings=
+resource-pack=
+player-idle-timeout=0
+level-name=world
+rcon.password=
+motd=\u00A7d CuteWorld
+query.port=25565
+force-gamemode=true
+debug=false
+hardcore=false
+white-list=false
+broadcast-console-to-ops=true
+pvp=true
+spawn-npcs=true
+spawn-animals=true
+generate-structures=true
+snooper-enabled=false
+difficulty=normal
+network-compression-threshold=256
+level-type=default
+max-tick-time=-1
+spawn-monsters=true
+enforce-whitelist=false
+max-players=10
+use-native-transport=true
+spawn-protection=16
+resource-pack-sha1=
+online-mode=true
+allow-flight=false
+max-world-size=29999984
+	EOF
+}
+
+eula.txt () {
+	cat >> $1/eula.txt <<-'EOF'
+#By changing the setting below to TRUE you are indicating your agreement to our EULA (https://account.mojang.com/documents/minecraft_eula).
+#Sun Feb 26 16:57:58 CET 2017
+eula=true
+	EOF
+}
+
+
+# File write template. Takes one argument "where to put the file"
+filetowrite.txt () {
+	cat >> $1/filetowrite.txt <<-'EOF'
+
+	EOF
+}
+
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#::::::::::::::                                          ::::::::::::::::::::::
 #::::::::::::::          Script Executive                ::::::::::::::::::::::
 #::::::::::::::                                          ::::::::::::::::::::::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -190,7 +381,7 @@ function find_active_newtork_interface (){
 
 # Check that the software components of this script are available.
 # iff they are not, attempt to install them. 
-for i in byobu speedometer htop python python3 dialog
+for i in byobu speedometer htop python3 dialog
 do
 	check_dependencies $i
 done
